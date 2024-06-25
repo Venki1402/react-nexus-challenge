@@ -1,22 +1,11 @@
-import { useState, useEffect } from "react";
-import "./AttendeeList.css";
+import { useState } from "react";
+import PropTypes from "prop-types";
+import Card from "react-bootstrap/Card";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-const AttendeeList = () => {
+const AttendeeList = ({ attendees }) => {
   // hooks
-  const [attendees, setAttendees] = useState([]);
   const [search, setSearch] = useState("");
-
-  useEffect(() => {
-    fetch("/attendees.json")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`ERROR! Status-code: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => setAttendees(data))
-      .catch((error) => console.error("Error:", error));
-  }, []);
 
   // search function
   const filteredAttendees = attendees.filter((attendee) =>
@@ -31,17 +20,35 @@ const AttendeeList = () => {
         value={search}
         placeholder="Search for attendees..."
         onChange={(e) => setSearch(e.target.value)}
+        className="search-bar"
+        style={{ margin: "10px" }}
       />
-      <ul>
+      <div className="card-container">
         {filteredAttendees.map((attendee) => (
-          <li key={attendee.id}>
-            <h2>{attendee.name}</h2>
-            <p>company : {attendee.company}</p>
-          </li>
+          <Card
+            border="secondary"
+            style={{ width: "18rem", margin: "10px" }}
+            key={attendee.id}
+          >
+            <Card.Body>
+              <Card.Title>{attendee.name}</Card.Title>
+              <Card.Text>Company: {attendee.company}</Card.Text>
+            </Card.Body>
+          </Card>
         ))}
-      </ul>
+      </div>
     </div>
   );
+};
+
+AttendeeList.propTypes = {
+  attendees: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      name: PropTypes.string.isRequired,
+      company: PropTypes.string.isRequired,
+    })
+  ).isRequired,
 };
 
 export default AttendeeList;
